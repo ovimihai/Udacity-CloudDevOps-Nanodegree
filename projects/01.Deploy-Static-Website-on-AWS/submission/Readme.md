@@ -19,5 +19,5 @@
 ![CloudFront](media/12.cloudfront.png)
 
 ## Visit CloudFront site
-![CloudFront site](media/13.cloudfront.png)
+![CloudFront site](media/13.cloudfront_site.png)
 
