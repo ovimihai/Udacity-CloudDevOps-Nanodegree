@@ -58,7 +58,9 @@ locals{
 }
 
 resource "null_resource" "upload_to_s3" {
-
+  triggers = {
+    pj_bucket = var.pj_bucket
+  }
   provisioner "local-exec" {
     environment = local.env
     command = "aws s3 sync site s3://${local.env.PJ_BUCKET}"
@@ -66,8 +68,7 @@ resource "null_resource" "upload_to_s3" {
 
   provisioner "local-exec" {
     when = destroy
-    # @todo - make it work with variables
-    command = "aws s3 rm --recursive s3://my-209409592105-bucket"
+    command = "aws s3 rm --recursive s3://${self.triggers.pj_bucket}"
   }
 
   depends_on = [aws_s3_bucket.create_bucket]
