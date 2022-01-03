@@ -63,25 +63,25 @@ Resources:
                 - ec2.amazonaws.com
             Action:
               - 'sts:AssumeRole'
-      # Policies:
-      #   - PolicyName: EmbeddedInlinePolicy
-      #     PolicyDocument:
-      #       Version: "2012-10-17"
-      #       Statement:
-      #         - Effect: Allow
-      #           Action: 
-      #           - "s3:Get*"
-      #           - "s3:List*"
-      #           Resource: '*'
+      Policies:
+        - PolicyName: EmbeddedInlinePolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                - "s3:Get*"
+                - "s3:List*"
+                Resource: '*'
       ManagedPolicyArns: 
         - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
-      RoleName: UdacityS3ReadOnlyEC2
+      RoleName: !Join ["-", [!Ref "AWS::StackName", "UdacityS3ReadOnlyEC2"]]
 
-  ProfileWithRolesForOurApp:
+  ProfileUdacityS3ReadOnlyEC2:
     Type: AWS::IAM::InstanceProfile
     Properties: 
       Roles:
-      - UdacityS3ReadOnlyEC2
+      - !Join ["-", [!Ref "AWS::StackName", "UdacityS3ReadOnlyEC2"]]
     DependsOn: UdacityS3ReadOnlyEC2
 
   VPC: 
@@ -290,9 +290,13 @@ Resources:
           sudo apt-get install apache2 -y
           sudo systemctl start apache2.service     
           cd /var/www/html
-          echo "Udacity Demo Web Server Up and Running!" > index.html     
+          echo "Udacity Demo Web Server Up and Running!" > index.html
+
+          sudo snap install aws-cli --classic
+          sudo aws s3 cp --recursive s3://my209409592105-udagram/ .
       ImageId: !Ref LinuxAmi
-      KeyName: !Ref SshKeyName
+      # KeyName: !Ref SshKeyName
+      IamInstanceProfile: !Ref ProfileUdacityS3ReadOnlyEC2
       SecurityGroups:
       - Ref: WebServerSecGroup
       InstanceType: !Ref LinuxInstanceType
@@ -303,13 +307,15 @@ Resources:
   WebAppGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
+      ### @TODO  Change to private at the end
       VPCZoneIdentifier:
       - !Ref PrivateSubnet1
       - !Ref PrivateSubnet2
       LaunchConfigurationName:
         Ref: WebAppLaunchConfig
       MinSize: '1'
-      MaxSize: '5'
+      MaxSize: '1'
+      DesiredCapacity: '1'
       TargetGroupARNs:
       - Ref: WebAppTargetGroup
   WebAppLB:
@@ -355,6 +361,53 @@ Resources:
       UnhealthyThresholdCount: 5
       VpcId: !Ref VPC
 
+
+  # Bastion setup
+  # inspiration: https://github.com/1Strategy/bastion-host-starter-template/blob/master/bastion.yaml
+  BastionASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Join ["", [!Ref "AWS::StackName", "BastionHostASG"]]
+      LaunchConfigurationName: !Ref BastionLaunchConfig
+      VPCZoneIdentifier:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      MinSize: "1"
+      DesiredCapacity: "1"
+      MaxSize: "1"
+      Tags:
+        - Key: Name
+          Value: !Join ["", [!Ref "AWS::StackName", "BastionHost"]]
+          PropagateAtLaunch: true
+
+  BastionLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      LaunchConfigurationName: !Join ["", [!Ref "AWS::StackName", "BastionHostLaunchConfiguration"]]
+      AssociatePublicIpAddress: true
+      ImageId: !Ref LinuxAmi
+      InstanceType: t3.micro
+      KeyName: !Ref SshKeyName
+      SecurityGroups:
+        - !Ref SecurityGroup
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Bastion Host Security Group
+      VpcId: !Ref VPC
+      GroupName: !Join ["", [ !Ref "AWS::StackName", "BastionHostSecurityGroup"]]
+
+  # Security Group Ingress rule for SSH access to Bastion Host
+  SecurityGroupSshIngressRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref SecurityGroup
+      IpProtocol: "tcp"
+      FromPort: 22
+      ToPort: 22
+      CidrIp: 86.126.30.54/32
+  
 
 Outputs: 
 
