@@ -1,0 +1,22 @@
+---
+- name: "install awscli"
+  become: true
+  yum:
+    name: awscli
+    state: latest
+
+- name: "create default vpc"
+  shell: "aws ec2 create-default-vpc"
+
+- name: "create security group"
+  shell: "aws ec2 create-security-group --description 'exercise ansible' --group-name 'ansible-machine'"
+
+- name: "add security group rule"
+  shell: "aws ec2 authorize-security-group-ingress --group-name ansible-machine --protocol tcp --port 22 --cidr 0.0.0.0/0"
+
+- name: "add security group rule"
+  shell: "aws ec2 authorize-security-group-ingress --group-name ansible-machine --protocol tcp --port 3000 --cidr 0.0.0.0/0"
+
+- name: "start ec2 machine"
+  shell: "aws ec2 run-instances --image-id ami-04d6bd0d7f6f5bdc3 --count 1 --instance-type t1.micro --key-name aws-udacity-cdopsnd --security-groups ansible-machine --tag-specifications 'ResourceType=instance,Tags=[{Key=Project,Value=udacity}]'"
+

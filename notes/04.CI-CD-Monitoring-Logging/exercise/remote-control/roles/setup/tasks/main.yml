@@ -1,0 +1,35 @@
+---
+- name: "update apt packages."
+  become: yes
+  apt:
+    update_cache: yes
+
+- name: "upgrade packages"
+  become: yes
+  apt:
+    upgrade: yes
+
+- name: "install node"
+  become: yes
+  apt:
+    name: 
+      - nodejs
+      - npm
+    state: latest
+
+- name: "install pm2"
+  shell: npm install pm2 -g
+
+- name: Create folder
+  file: >
+    path=/var/www/web
+    recurse=yes
+    state=directory
+
+- name: Copy index.js
+  copy:
+    src: index.js
+    dest: /var/www/web/index.js
+
+- name: "Start webserver"
+  shell: pm2 start /var/www/web/index.js -f
