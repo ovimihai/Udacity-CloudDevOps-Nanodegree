@@ -18,7 +18,12 @@
     state: latest
 
 - name: "install pm2"
-  shell: npm install pm2 -g
+  become: yes
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
 
 - name: Create folder
   file: >
