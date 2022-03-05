@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Ovidiu Anicai - Udacity
+Resources:
+  EKSCluster:
+    Type: "AWS::EKS::Cluster"
+    Properties:
+      Name: eksctl-eksctl-demo-cluster
+      Version: "1.20"
+      RoleArn: "arn:aws:iam::209409592105:role/myEksClusterRole"
+      ResourcesVpcConfig:
+        SecurityGroupIds:
+          - sg-09aa8ddb4c9e5f27d
+        SubnetIds:
+          - subnet-05a283e4fb4779bb9
+          - subnet-0163b9d2728ccc8b4
+        EndpointPublicAccess: false
+        EndpointPrivateAccess: true
+        PublicAccessCidrs: [ "1.1.1.2/32" ]
+      Logging:
+        ClusterLogging:
+          EnabledTypes:
+            - Type: api
+            - Type: audit
+      Tags:
+        - Key: "Name"
+          Value: "eksctl-eksctl-demo-cluster"
+

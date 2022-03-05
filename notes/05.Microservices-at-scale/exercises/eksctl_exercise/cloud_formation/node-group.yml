@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Ovidiu Anicai - Udacity
+Resources:
+  EKSNodegroup:
+    Type: 'AWS::EKS::Nodegroup'
+    Properties:
+      ClusterName: eksctl-eksctl-demo-cluster
+      NodeRole: 'arn:aws:iam::209409592105:role/myEksNodeRole'
+      InstanceTypes:
+        - t3.micro
+        #- m5.large
+      DiskSize: 20
+      ScalingConfig:
+        MinSize: 2
+        DesiredSize: 2
+        MaxSize: 2
+      Labels:
+        Name: Node-group-1
+      Subnets:
+        - subnet-05a283e4fb4779bb9
+        - subnet-0163b9d2728ccc8b4
