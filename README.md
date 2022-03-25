@@ -1,7 +1,5 @@
 # Udacity Cloud DevOps Nanodegree
 
-[![Open in Gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/ovimihai/Udacity-CloudDevOps-Nanodegree)
-
 ## Course notes
 
 - [Introduction](notes/01.Introduction/01.Introduction.md) - [Terraform](projects/02.Deploy-Static-Website-on-AWS/solution)
@@ -16,7 +14,6 @@
 - [CI/CD Monitoring And Logging](projects/04.CI-CD-Monitoring-Logging/01.Project-Objectives.md) - [GIT Repo](https://github.com/ovimihai/cdond-c3-projectstarter/blob/master/solution/Screenshots.md)
 - [Operationalizing a ML Microservice](projects/05.Operationalizing-ML-Microservice/01.Project-Overview.md) - [GIT Repo](https://github.com/ovimihai/cdond-ml-microservice-kubernetes)
 - [Capstone Project](projects/06.Capstone-project/01.Overview.md) - [GIT Repo](https://github.com/ovimihai/cdond-capstone-project)
-
 
 
 [Certificate](https://confirm.udacity.com/DASQQLMN)
